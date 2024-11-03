@@ -100,9 +100,13 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "There are too many arguments, please try again.\n");
     return -1;  //failed check
   }
+  
 
-  //if target dir is greater than one, cmd->first word after cd  (may need to split up command to implement, keep looking at code)
-  chdir(target_dir);
+  if(chdir(target_dir) != 0)  // check if able to change to the target directory, if not, return -1
+  {
+    dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Unable to change to target directory.\n");
+    return -1;
+  }
   return 0;
 }
 
@@ -128,10 +132,13 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
   else
   {
     //strtol to get exit status
+    char *endptr;
+    long n = strtol(cmd->word_count[1], &endptr, 10);
+    params.status = (int)n;
+    bigshell_exit();
   }
   //tokenize the command and if the first word is exit, the second command should be the exit status
   //set params.status to that exit status strtol from videos?
-  bigshell_exit();
   return -1;
 }
 
