@@ -125,7 +125,8 @@ static int
 builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
 {
   if (cmd->word_count == 1)
-  {
+  { 
+    // printf("Exit status %d\n", params.status);
     bigshell_exit();
   }
 
@@ -133,8 +134,9 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
   {
     //strtol to get exit status
     char *endptr;
-    long n = strtol(cmd->word_count[1], &endptr, 10);
+    long n = strtol(cmd->words[1], &endptr, 10);
     params.status = (int)n;
+    // printf("Exit status %d\n", params.status);
     bigshell_exit();
   }
   //tokenize the command and if the first word is exit, the second command should be the exit status
