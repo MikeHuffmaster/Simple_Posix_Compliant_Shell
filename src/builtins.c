@@ -135,13 +135,17 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
     //strtol to get exit status
     char *endptr;
     long n = strtol(cmd->words[1], &endptr, 10);
+    if (*endptr != '\0')
+    {
+      dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "A proper exit status was not given.\n");
+      return -1;
+    }
     params.status = (int)n;
     // printf("Exit status %d\n", params.status);
     bigshell_exit();
   }
   //tokenize the command and if the first word is exit, the second command should be the exit status
   //set params.status to that exit status strtol from videos?
-  return -1;
 }
 
 /** exports variables to the environment
