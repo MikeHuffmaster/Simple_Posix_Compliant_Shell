@@ -88,9 +88,20 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
       dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "cd: HOME not set\n");
       return -1;
     }
+  } 
+  else if (cmd->word_count == 2)  //there is ecactly one argument for cd
+  {
+    target_dir = cmd->words[1];
+    // dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Executed cd: %s\n", cmd->words[1]);
   }
-  /*TODO: Implement cd with arguments 
-   */
+
+  else  //there are too many arguments for cd
+  {
+    dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "There are too many arguments, please try again.\n");
+    return -1;  //failed check
+  }
+
+  //if target dir is greater than one, cmd->first word after cd  (may need to split up command to implement, keep looking at code)
   chdir(target_dir);
   return 0;
 }
@@ -109,7 +120,17 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
 static int
 builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
 {
-  /* TODO: Set params.status to the appropriate value before exiting */
+  if (cmd->word_count == 1)
+  {
+    bigshell_exit();
+  }
+
+  else
+  {
+    //strtol to get exit status
+  }
+  //tokenize the command and if the first word is exit, the second command should be the exit status
+  //set params.status to that exit status strtol from videos?
   bigshell_exit();
   return -1;
 }
@@ -151,6 +172,8 @@ builtin_unset(struct command *cmd, struct builtin_redir const *redir_list)
 {
   for (size_t i = 1; i < cmd->word_count; ++i) {
     /* TODO: Unset variables */
+    // free? the variables associated with the location being pointed to until the end of the argument
+    //start at cmd->words[i]
   }
   return 0;
 }
