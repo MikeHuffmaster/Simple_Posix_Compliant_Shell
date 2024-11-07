@@ -33,9 +33,12 @@
 static int
 get_pseudo_fd(struct builtin_redir const *redir_list, int fd)
 {
-  for (; redir_list; redir_list = redir_list->next) {
-    if (redir_list->realfd == fd) return -1;
-    if (redir_list->pseudofd == fd) return redir_list->realfd;
+  for (; redir_list; redir_list = redir_list->next)
+  {
+    if (redir_list->realfd == fd)
+      return -1;
+    if (redir_list->pseudofd == fd)
+      return redir_list->realfd;
   }
   return fd;
 }
@@ -71,9 +74,11 @@ static int
 builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
 {
   char const *target_dir = 0;
-  if (cmd->word_count == 1) {
+  if (cmd->word_count == 1)
+  {
     target_dir = vars_get("HOME");
-    if (!target_dir) {
+    if (!target_dir)
+    {
       /* XXX Notice instead of printing to the REAL stderr, we print to the
        * pseudo-redirected stderr, using dprintf and the get_pseudo_fd function
        *
@@ -88,21 +93,20 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
       dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "cd: HOME not set\n");
       return -1;
     }
-  } 
-  else if (cmd->word_count == 2)  //there is ecactly one argument for cd
+  }
+  else if (cmd->word_count == 2) // there is ecactly one argument for cd
   {
     target_dir = cmd->words[1];
     // dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Executed cd: %s\n", cmd->words[1]);
   }
 
-  else  //there are too many arguments for cd
+  else // there are too many arguments for cd
   {
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "There are too many arguments, please try again.\n");
-    return -1;  //failed check
+    return -1; // failed check
   }
-  
 
-  if(chdir(target_dir) != 0)  // check if able to change to the target directory, if not, return -1
+  if (chdir(target_dir) != 0) // check if able to change to the target directory, if not, return -1
   {
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Unable to change to target directory.\n");
     return -1;
@@ -125,14 +129,14 @@ static int
 builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
 {
   if (cmd->word_count == 1)
-  { 
+  {
     // printf("Exit status %d\n", params.status);
     bigshell_exit();
   }
 
   else
   {
-    //strtol to get exit status
+    // strtol to get exit status
     char *endptr;
     long n = strtol(cmd->words[1], &endptr, 10);
     if (*endptr != '\0')
@@ -144,8 +148,9 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
     // printf("Exit status %d\n", params.status);
     bigshell_exit();
   }
-  //tokenize the command and if the first word is exit, the second command should be the exit status
-  //set params.status to that exit status strtol from videos?
+  // tokenize the command and if the first word is exit, the second command should be the exit status
+  // set params.status to that exit status strtol from videos?
+  return -1;
 }
 
 /** exports variables to the environment
@@ -159,16 +164,23 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
 static int
 builtin_export(struct command *cmd, struct builtin_redir const *redir_list)
 {
-  for (size_t i = 1; i < cmd->word_count; ++i) {
+  for (size_t i = 1; i < cmd->word_count; ++i)
+  {
     char *word = cmd->words[i];
     char *v = strchr(word, '=');
-    if (v) {
+    if (v)
+    {
       *v = '\0';
-      if (vars_set(word, v + 1) < 0) return -1;
-      if (vars_export(word) < 0) return -1;
+      if (vars_set(word, v + 1) < 0)
+        return -1;
+      if (vars_export(word) < 0)
+        return -1;
       *v = '=';
-    } else {
-      if (vars_export(word) < 0) return -1;
+    }
+    else
+    {
+      if (vars_export(word) < 0)
+        return -1;
     }
   }
   return 0;
@@ -183,10 +195,12 @@ builtin_export(struct command *cmd, struct builtin_redir const *redir_list)
 static int
 builtin_unset(struct command *cmd, struct builtin_redir const *redir_list)
 {
-  for (size_t i = 1; i < cmd->word_count; ++i) {
+  for (size_t i = 1; i < cmd->word_count; ++i)
+  {
+    unsetenv(cmd->words[i]);
     /* TODO: Unset variables */
-    // free? the variables associated with the location being pointed to until the end of the argument
-    //start at cmd->words[i]
+    // use unsetenv to unset the variables associated with the location being pointed to until the end of the argument
+    // start at cmd->words[i]
   }
   return 0;
 }
@@ -199,17 +213,22 @@ static int
 builtin_fg(struct command *cmd, struct builtin_redir const *redir_list)
 {
   jid_t job_id = -1;
-  if (cmd->word_count == 1) {
+  if (cmd->word_count == 1)
+  {
     size_t job_count = jobs_get_joblist_size();
-    if (job_count == 0) {
+    if (job_count == 0)
+    {
       dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "No jobs\n");
       return -1;
     }
     job_id = jobs_get_joblist()[0].jid;
-  } else if (cmd->word_count == 2) {
+  }
+  else if (cmd->word_count == 2)
+  {
     char *end = cmd->words[1];
     long val = strtol(cmd->words[1], &end, 10);
-    if (*end || !cmd->words[1][0] || val < 0 || val > INT_MAX) {
+    if (*end || !cmd->words[1][0] || val < 0 || val > INT_MAX)
+    {
       dprintf(get_pseudo_fd(redir_list, STDERR_FILENO),
               "fg: `%s': %s\n",
               cmd->words[1],
@@ -217,7 +236,9 @@ builtin_fg(struct command *cmd, struct builtin_redir const *redir_list)
       return -1;
     }
     job_id = val;
-  } else {
+  }
+  else
+  {
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO),
             "fg: `%s': %s\n",
             cmd->words[2],
@@ -226,13 +247,15 @@ builtin_fg(struct command *cmd, struct builtin_redir const *redir_list)
   }
 
   pid_t pgid = jobs_get_pgid(job_id);
-  if (pgid < 0) {
+  if (pgid < 0)
+  {
     errno = EINVAL;
     goto err;
   }
   kill(-pgid, SIGCONT);
 
-  if (wait_on_fg_job(job_id) < 0) goto err;
+  if (wait_on_fg_job(job_id) < 0)
+    goto err;
 
   return 0;
 err:
@@ -248,14 +271,19 @@ static int
 builtin_bg(struct command *cmd, struct builtin_redir const *redir_list)
 {
   jid_t job_id = -1;
-  if (cmd->word_count == 1) {
+  if (cmd->word_count == 1)
+  {
     size_t job_count = jobs_get_joblist_size();
-    if (job_count == 0) return -1;
+    if (job_count == 0)
+      return -1;
     job_id = jobs_get_joblist()[0].jid;
-  } else if (cmd->word_count == 2) {
+  }
+  else if (cmd->word_count == 2)
+  {
     char *end = cmd->words[1];
     long val = strtol(cmd->words[1], &end, 10);
-    if (*end || !cmd->words[1][0] || val < 0 || val > INT_MAX) {
+    if (*end || !cmd->words[1][0] || val < 0 || val > INT_MAX)
+    {
       dprintf(get_pseudo_fd(redir_list, STDERR_FILENO),
               "fg: `%s': %s\n",
               cmd->words[1],
@@ -263,7 +291,9 @@ builtin_bg(struct command *cmd, struct builtin_redir const *redir_list)
       return -1;
     }
     job_id = val;
-  } else {
+  }
+  else
+  {
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO),
             "fg: `%s': %s\n",
             cmd->words[2],
@@ -272,7 +302,8 @@ builtin_bg(struct command *cmd, struct builtin_redir const *redir_list)
   }
 
   pid_t pgid = jobs_get_pgid(job_id);
-  if (pgid < 0) {
+  if (pgid < 0)
+  {
     errno = EINVAL;
     goto err;
   }
@@ -295,7 +326,8 @@ builtin_jobs(struct command *cmd, struct builtin_redir const *redir_list)
 {
   size_t job_count = jobs_get_joblist_size();
   struct job const *jobs = jobs_get_joblist();
-  for (size_t i = 0; i < job_count; ++i) {
+  for (size_t i = 0; i < job_count; ++i)
+  {
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO),
             "[%jd] %jd\n",
             (intmax_t)jobs[i].jid,
@@ -314,13 +346,22 @@ builtin_jobs(struct command *cmd, struct builtin_redir const *redir_list)
 builtin_fn
 get_builtin(struct command *cmd)
 {
-  if (cmd->word_count == 0) return builtin_null;
-  else if (strcmp(cmd->words[0], "cd") == 0) return builtin_cd;
-  else if (strcmp(cmd->words[0], "exit") == 0) return builtin_exit;
-  else if (strcmp(cmd->words[0], "fg") == 0) return builtin_fg;
-  else if (strcmp(cmd->words[0], "bg") == 0) return builtin_bg;
-  else if (strcmp(cmd->words[0], "jobs") == 0) return builtin_jobs;
-  else if (strcmp(cmd->words[0], "unset") == 0) return builtin_unset;
-  else if (strcmp(cmd->words[0], "export") == 0) return builtin_export;
-  else return 0;
+  if (cmd->word_count == 0)
+    return builtin_null;
+  else if (strcmp(cmd->words[0], "cd") == 0)
+    return builtin_cd;
+  else if (strcmp(cmd->words[0], "exit") == 0)
+    return builtin_exit;
+  else if (strcmp(cmd->words[0], "fg") == 0)
+    return builtin_fg;
+  else if (strcmp(cmd->words[0], "bg") == 0)
+    return builtin_bg;
+  else if (strcmp(cmd->words[0], "jobs") == 0)
+    return builtin_jobs;
+  else if (strcmp(cmd->words[0], "unset") == 0)
+    return builtin_unset;
+  else if (strcmp(cmd->words[0], "export") == 0)
+    return builtin_export;
+  else
+    return 0;
 }
