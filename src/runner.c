@@ -429,6 +429,11 @@ run_command_list(struct command_list *cl)
      * [TODO] Re-assign child_pid to the new process id
      * [TODO] Handle errors if they occur
      */
+    if (!(cmd->ctrl_op == ';' && is_builtin)){  //if not a builtin or fg command
+      child_pid = fork();
+    }
+
+
     int const did_fork = 0; /* TODO */
     if (did_fork) {
       /* [TODO] fork */
