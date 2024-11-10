@@ -441,7 +441,7 @@ run_command_list(struct command_list *cl)
         }
         _exit(fork_status);
       }
-      
+
     }
 
     else      // run the external commands
@@ -449,10 +449,6 @@ run_command_list(struct command_list *cl)
       execvp(cmd->words[0], cmd->words);  
     }
 
-
-    int const did_fork = 0; /* TODO */
-    if (did_fork) {
-      /* [TODO] fork */
 
       /* All of the processes in a pipeline (or single command) belong to the
        * same process group. This is how the shell manages job control. We will
@@ -468,6 +464,36 @@ run_command_list(struct command_list *cl)
        * it in both the parent and the child, and ignore an EACCES error if it
        * occurs.
        */
+    int const did_fork = 0; /* TODO */
+    if (did_fork) {
+
+      pid_t pgid;
+
+      if (child_pid == 0)
+      {
+        if (pipeline_data.pgid == 0)
+        {
+          pgid = getpgid(0);
+        }
+        else
+        {
+          pgid = pipeline_data.pgid; 
+        }
+
+        if (setpgid(0, pgid) == -1)  // if the PGID is equal to -1, it failed to return a process group ID
+        {
+          if (errno == EACCES)
+          {
+            errno = 0;
+          }
+          else 
+          {
+            perror("Group ID could not be set");
+            exit(1);
+          }
+        }
+      } 
+
 
       if (setpgid(child_pid, pipeline_data.pgid) < 0) {
         if (errno == EACCES) errno = 0;
