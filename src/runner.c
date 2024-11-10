@@ -75,11 +75,11 @@ do_variable_assignment(struct command const *cmd, int export_all)
 
     if (export_all == 0)
     {
-      setenv(a->name, a->value, 0) // dont export the variable
+      setenv(a->name, a->value, 0); // dont export the variable
     }
     else
     {
-     setenv(a-> name, a->value, 1) //export the variable
+     setenv(a-> name, a->value, 1); //export the variable
     }
   }
   return 0;
