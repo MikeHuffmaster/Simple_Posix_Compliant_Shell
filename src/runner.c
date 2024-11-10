@@ -42,8 +42,19 @@ expand_command_words(struct command *cmd)
   for (size_t i = 0; i < cmd->word_count; ++i) {
     expand(&cmd->words[i]);
   }
-  /* TODO Assignment values */
-  /* TODO I/O Filenames */
+  
+  for (size_t i = 0; i < cmd->assignment_count; i++) // assignment count in parser.h
+  {
+    struct assignment *a = cmd->assignments[i];  //need struct to work with name and value
+    expand(&a -> value);
+  }
+
+  for (size_t i = 0; i < cmd-> io_redir_count; i++) //io_redir_count in parser.h
+  {
+    struct io_redir *redir = cmd->io_redirs[i];  //need struct to work with name and value
+    expand(&redir->filename);
+  }
+  
   return 0;
 }
 
