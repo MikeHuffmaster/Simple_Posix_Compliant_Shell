@@ -431,6 +431,16 @@ run_command_list(struct command_list *cl)
      */
     if (!(cmd->ctrl_op == ';' && is_builtin)){  //if not a builtin or fg command
       child_pid = fork();
+
+      if (child_pid == 0 && is_builtin)
+      {
+        int fork_status = builtin(cmd->words);
+      }
+    }
+
+    else      // run the external commands
+    {
+      execvp(cmd->words[0], cmd->words);  //
     }
 
 
