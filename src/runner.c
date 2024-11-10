@@ -310,7 +310,10 @@ do_io_redirects(struct command *cmd)
          *
          * XXX What is n? Look for it in `struct io_redir->???` (parser.h)  *****n is the left hand file desciptor operand
          */
-        close(r->io_number);
+        if(close(r->io_number)==-1)
+        {
+          goto err;
+        }
 
       } else {
         /* The filename is interpreted as a file descriptor number to
@@ -333,7 +336,9 @@ do_io_redirects(struct command *cmd)
                                  downcasting */
         ) {
           /*duplicate src to dst. */
-          dup2(src, dst); 
+          if (dup2(src, r->io_number)== -1){
+            goto err; 
+          } 
         } else {
           /* XXX Syntax error--(not a valid number)--we can "recover" by
            * attempting to open a file instead. That's what bash does.
@@ -355,6 +360,20 @@ do_io_redirects(struct command *cmd)
 
       /* TODO Move the opened file descriptor to the redirection target */
       /* XXX use move_fd() */
+
+      mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;    //rw-r--r-- permissions 
+
+      int file = open(r->filename, flags, mode);
+
+      if (file == -1)
+      {
+        goto err;
+      }
+
+      if(move_fd(file, r->io_number) ==-1)
+      {
+        goto err; 
+      }
     }
     if (0) {
     err: /* TODO Anything that can fail should jump here. No silent errors!!! */
