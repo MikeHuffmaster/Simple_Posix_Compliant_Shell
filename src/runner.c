@@ -308,8 +308,10 @@ do_io_redirects(struct command *cmd)
         /* [n]>&- and [n]<&- close file descriptor [n] */
         /* TODO close file descriptor n.
          *
-         * XXX What is n? Look for it in `struct io_redir->???` (parser.h)
+         * XXX What is n? Look for it in `struct io_redir->???` (parser.h)  *****n is the left hand file desciptor operand
          */
+        close(r->io_number);
+
       } else {
         /* The filename is interpreted as a file descriptor number to
          * redirect to. For example, 2>&1 duplicates file descriptor 1
@@ -330,7 +332,8 @@ do_io_redirects(struct command *cmd)
             && src <= INT_MAX /* <--- this is *critical* bounds checking when
                                  downcasting */
         ) {
-          /* TODO duplicate src to dst. */
+          /*duplicate src to dst. */
+          dup2(src, dst); 
         } else {
           /* XXX Syntax error--(not a valid number)--we can "recover" by
            * attempting to open a file instead. That's what bash does.
