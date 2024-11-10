@@ -120,20 +120,20 @@ get_io_flags(enum io_operator io_op)
   switch (io_op) {
     case OP_LESSAND: /* <& */
     case OP_LESS:    /* < */
-      flags = 0;     /* TODO */
+      flags = O_RDONLY;     //read only
       break;
     case OP_GREATAND: /* >& */
     case OP_GREAT:    /* > */
-      flags = 0;      /* TODO */
+      flags = O_WRONLY | O_CREAT | O_EXCL;      //write, creat, fail
       break;
     case OP_DGREAT: /* >> */
-      flags = 0;    /* TODO */
+      flags = O_WRONLY | O_CREAT | O_APPEND;    //write, create, append
       break;
     case OP_LESSGREAT: /* <> */
-      flags = 0;       /* TODO */
+      flags = O_RDWR | O_CREAT;       //read write create
       break;
     case OP_CLOBBER: /* >| */
-      flags = 0;     /* TODO */
+      flags = O_WRONLY | O_CREAT | O_TRUNC;     //read, create, truncate
       break;
   }
   return flags;
@@ -441,13 +441,7 @@ run_command_list(struct command_list *cl)
     int const is_builtin = !!builtin;
 
     pid_t child_pid = 0;
-    /*
-     * [TODO] Fork process if:
-     *       Not a buitin command, OR
-     *       Not a foreground command
-     * [TODO] Re-assign child_pid to the new process id
-     * [TODO] Handle errors if they occur
-     */
+
     if (!(cmd->ctrl_op == ';' && is_builtin)){  //if not a builtin or fg command
       child_pid = fork();
 
