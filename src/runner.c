@@ -434,13 +434,19 @@ run_command_list(struct command_list *cl)
 
       if (child_pid == 0 && is_builtin)
       {
-        int fork_status = builtin(cmd->words);
+        int fork_status = builtin;
+        if (fork_status != 0)
+        {
+          fprintf(stderr, "Failed with exit status %d\n", fork_status);
+        }
+        _exit(fork_status);
       }
+      
     }
 
     else      // run the external commands
     {
-      execvp(cmd->words[0], cmd->words);  //
+      execvp(cmd->words[0], cmd->words);  
     }
 
 
