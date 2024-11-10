@@ -141,7 +141,7 @@ get_io_flags(enum io_operator io_op)
 
 /** moves a file descriptor
  *
- * @param src  the source file descriptor
+ * @param src  the source file descriptor  dup?
  * @param dst  the target file descriptor
  * @returns    dst on success, -1 on failure
  *
@@ -153,8 +153,14 @@ static int
 move_fd(int src, int dst)
 {
   if (src == dst) return dst;
-  /* TODO move src to dst */
-  /* TODO close src */
+  
+  if (dup2(src, dst)== -1) //move file descriptor, and if it fails return -1
+  {
+    return -1;
+  }
+
+   close(src); // close the source
+
   return dst;
 }
 
