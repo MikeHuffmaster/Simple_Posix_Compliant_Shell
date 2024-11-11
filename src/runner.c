@@ -514,7 +514,7 @@ run_command_list(struct command_list *cl)
        * it in both the parent and the child, and ignore an EACCES error if it
        * occurs.
        */
-    int const did_fork = 0; /* TODO */
+    int const did_fork = 0; 
     if (did_fork) {
 
       pid_t pgid;
@@ -532,7 +532,7 @@ run_command_list(struct command_list *cl)
 
         if (setpgid(0, pgid) == -1)  // if the PGID is equal to -1, it failed to return a process group ID
         {
-          if (errno == EACCES)
+          if (errno == EACCES) //ignore eacces error
           {
             errno = 0;
           }
@@ -615,6 +615,27 @@ run_command_list(struct command_list *cl)
          *
          * [TODO] move downstream_pipefd to STDOUT_FILENO if it's valid
          */
+        if (upstream_pipefd >= 0)
+        {
+          if(dup2(upstream_pipefd, STDIN_FILENO)== -1) //move upstream_pipe fd to STDIN and error check 
+          {
+          perror("Failed to move upstream pipe");
+          exit(1);
+          }
+        close(upstream_pipefd);
+        }
+
+
+        if (downstream_pipefd >= 0)  
+        {
+          if (dup2(downstream_pipefd, STDOUT_FILENO) == -1)  //move downstream_pipe fd to stout and error check for failures 
+          {
+            perror("Failed to move downstream pipe");
+            exit(1);
+          }
+          close(downstream_pipefd);
+        }
+
 
         /* Now handle the remaining redirect operators from the command. */
         if (do_io_redirects(cmd) < 0) err(1, 0);
