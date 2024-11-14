@@ -50,7 +50,7 @@ is_valid_varname(char const *name)
     return 0;
   }
 
-  for (int i = 1; i < length; i++;)
+  for (int i = 1; i < length; i++)
   {
     if (!isalnum(name[i] && name[i] != '_'))
     {
