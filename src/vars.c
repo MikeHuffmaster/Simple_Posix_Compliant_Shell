@@ -10,7 +10,8 @@
 #include "util/gprintf.h"
 #include "vars.h"
 
-struct var {
+struct var
+{
   struct var *next;
   bool export : 1;
   char *value;
@@ -19,7 +20,7 @@ struct var {
 
 static struct var *var_list = 0;
 
-/** Checks if a variable name is a valid XBD name 
+/** Checks if a variable name is a valid XBD name
  *
  * @returns 1 if yes, 0 if not
  *
@@ -37,20 +38,36 @@ is_valid_varname(char const *name)
    *  regex to match: [A-Za-z_][A-Za-z0-9_]*
    *
    * You'll most definitely want to use functions from: ctype.h(0P)
+   *
+   * can contain letters (a-z, A-Z), digits (0-9), and underscores (_),
+   * but must always start with a letter or an underscore
    */
-  errno = ENOSYS; /* Not implemented */
-  return -1;
+
+  int length = strlen(name);
+
+  if (name[0] != '_' && !isalpha(name[0]))
+  {
+    return 0;
+  }
+
+  for (int i = 1; i < length; i++;)
+  {
+    if (!isalnum(name[i] && name[i] != '_'))
+    {
+      return 0;
+    }
+  }
+  return 1;
 }
 
-/** Checks if a variable name is a valid XBD name 
+/** Checks if a variable name is a valid XBD name
  *
  * @returns 1 if yes, 0 if not
  *
  * This is an external function that validates its argument before calling the
- * internal unsafe version 
+ * internal unsafe version
  */
-int
-vars_is_valid_varname(char const *name)
+int vars_is_valid_varname(char const *name)
 {
   /* TODO: Implement argument validation before tail-calling internal
    * is_valid_varname() function. */
@@ -58,9 +75,9 @@ vars_is_valid_varname(char const *name)
   return -1;
 }
 
-/** returns nullptr if not found 
+/** returns nullptr if not found
  *
- * XXX DO NOT MODIFY XXX 
+ * XXX DO NOT MODIFY XXX
  */
 static struct var *
 find_var(char const *name)
@@ -70,16 +87,18 @@ find_var(char const *name)
 
   /* Search local varlist */
   struct var *v = var_list;
-  for (; v; v = v->next) {
-    if (strcmp(v->name, name) == 0) return v;
+  for (; v; v = v->next)
+  {
+    if (strcmp(v->name, name) == 0)
+      return v;
   }
 
   return 0;
 }
 
-/** Creates a new var with name and inserts into var list 
+/** Creates a new var with name and inserts into var list
  *
- * XXX DO NOT MODIFY XXX 
+ * XXX DO NOT MODIFY XXX
  */
 static struct var *
 new_var(char const *name)
@@ -87,13 +106,17 @@ new_var(char const *name)
   assert(is_valid_varname(name));
   assert(!find_var(name));
   struct var *v = malloc(sizeof *v + strlen(name) + 1);
-  if (!v) return 0;
+  if (!v)
+    return 0;
   strcpy(v->name, name);
 
   char *val = getenv(name);
-  if (val) {
+  if (val)
+  {
     v->export = 1;
-  } else {
+  }
+  else
+  {
     v->export = 0;
   }
   v->value = 0;
@@ -102,17 +125,19 @@ new_var(char const *name)
   return v;
 }
 
-/** Remove a var from varlist and return it 
+/** Remove a var from varlist and return it
  *
- * XXX DO NOT MODIFY XXX 
+ * XXX DO NOT MODIFY XXX
  */
 static void
 remove_var(char const *name)
 {
   assert(is_valid_varname(name));
   struct var **link = &var_list;
-  for (; *link; link = &((*link)->next)) {
-    if (strcmp((*link)->name, name) == 0) {
+  for (; *link; link = &((*link)->next))
+  {
+    if (strcmp((*link)->name, name) == 0)
+    {
       void *tmp = (*link)->next;
       free((*link)->value);
       free(*link);
@@ -124,7 +149,7 @@ remove_var(char const *name)
 
 /** Return existing var, or make a new var
  *
- * XXX DO NOT MODIFY XXX 
+ * XXX DO NOT MODIFY XXX
  */
 static struct var *
 ensure_var(char const *name)
@@ -135,25 +160,28 @@ ensure_var(char const *name)
 }
 
 /* XXX DO NOT MODIFY XXX */
-int
-vars_set(char const *name, char const *value)
+int vars_set(char const *name, char const *value)
 {
-  if (!name || !value || !is_valid_varname(name)) {
+  if (!name || !value || !is_valid_varname(name))
+  {
     errno = EINVAL;
     return -1;
   }
   gprintf("vars_set(%s, %s)", name, value);
 
   struct var *v = ensure_var(name);
-  if (!v) return -1;
+  if (!v)
+    return -1;
 
-  if (v->export) {
+  if (v->export)
+  {
     gprintf("%s=%s is exported, updating env", name, value);
     return setenv(name, value, 1);
   }
 
   char *dupval = strdup(value);
-  if (!dupval) return -1;
+  if (!dupval)
+    return -1;
   v->value = dupval;
   return 0;
 }
@@ -162,7 +190,8 @@ vars_set(char const *name, char const *value)
 char const *
 vars_get(char const *name)
 {
-  if (!name || !is_valid_varname(name)) {
+  if (!name || !is_valid_varname(name))
+  {
     errno = EINVAL;
     return 0;
   }
@@ -170,7 +199,8 @@ vars_get(char const *name)
   gprintf("searching for %s in local var list", name);
   /* Look through our local var list */
   struct var *v = find_var(name);
-  if (v && !v->export) {
+  if (v && !v->export)
+  {
     gprintf("found local var %s with value %s", name, v->value);
     return v->value;
   }
@@ -179,9 +209,12 @@ vars_get(char const *name)
   /* Fallback to searching environment */
   char const *value = getenv(name);
 #ifndef NDEBUG
-  if (value) {
+  if (value)
+  {
     gprintf("found env var %s with value %s", name, value);
-  } else {
+  }
+  else
+  {
     gprintf("did not find var %s", name);
   }
 #endif
@@ -189,10 +222,10 @@ vars_get(char const *name)
 }
 
 /* XXX DO NOT MODIFY XXX */
-int
-vars_unset(char const *name)
+int vars_unset(char const *name)
 {
-  if (!name || !is_valid_varname(name)) {
+  if (!name || !is_valid_varname(name))
+  {
     errno = EINVAL;
     return -1;
   }
@@ -202,24 +235,27 @@ vars_unset(char const *name)
 }
 
 /* XXX DO NOT MODIFY XXX */
-int
-vars_export(char const *name)
+int vars_export(char const *name)
 {
-  if (!name || !is_valid_varname(name)) {
+  if (!name || !is_valid_varname(name))
+  {
     errno = EINVAL;
     return -1;
   }
   gprintf("marking %s for export", name);
   struct var *v = ensure_var(name);
-  if (!v) return -1;
+  if (!v)
+    return -1;
 
   /* Mark exported */
   v->export = 1;
 
   /* Only actually export to env if already set */
-  if (v->value) {
+  if (v->value)
+  {
     gprintf("exporting value %s for var %s", v->value, name);
-    if (setenv(v->name, v->value, 1) < 0) {
+    if (setenv(v->name, v->value, 1) < 0)
+    {
       return -1;
     }
   }
@@ -227,10 +263,10 @@ vars_export(char const *name)
 }
 
 /* XXX DO NOT MODIFY XXX */
-void
-vars_cleanup(void)
+void vars_cleanup(void)
 {
-  while (var_list) {
+  while (var_list)
+  {
     struct var *v = var_list;
     var_list = v->next;
     free(v->value);
