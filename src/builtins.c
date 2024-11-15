@@ -90,26 +90,21 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
        * know to use this type of print statement in your builtins for the
        * correct behavior. :)
        */
-      dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "cd: HOME not set\n");
-      return -1;
+      target_dir = getenv("HOME");
+      chdir(target_dir);
     }
   }
   else if (cmd->word_count == 2) // there is ecactly one argument for cd
   {
     target_dir = cmd->words[1];
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Executed cd: %s\n", cmd->words[1]);
+    chdir(target_dir);
   }
 
   else // there are too many arguments for cd
   {
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "There are too many arguments, please try again.\n");
     return -1; // failed check
-  }
-
-  if (chdir(target_dir) != 0) // check if able to change to the target directory, if not, return -1
-  {
-    dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Unable to change to target directory.\n");
-    return -1;
   }
   return 0;
 }
@@ -130,7 +125,7 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
 {
   if (cmd->word_count == 1)
   {
-    // printf("Exit status %d\n", params.status)
+    printf("Exit status %d\n", params.status);
     bigshell_exit();
   }
 
