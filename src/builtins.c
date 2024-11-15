@@ -92,13 +92,15 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
        */
       target_dir = getenv("HOME");
       chdir(target_dir);
+      return 0;
     }
   }
   else if (cmd->word_count == 2) // there is ecactly one argument for cd
   {
     target_dir = cmd->words[1];
-    dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Executed cd: %s\n", cmd->words[1]);
+    // dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Executed cd: %s\n", cmd->words[1]);
     chdir(target_dir);
+    return 0;
   }
 
   else // there are too many arguments for cd
