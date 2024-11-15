@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include <signal.h>
 #include <errno.h>
+#include <stddef.h>
 
 #include "signal.h"
 
@@ -18,7 +19,7 @@ static struct sigaction ignore_action = {.sa_handler = SIG_IGN},
                         old_sigtstp, old_sigint, old_sigttou;
 
 /* Ignore certain signals.
- * 
+ *
  * @returns 0 on succes, -1 on failure
  *
  *
@@ -27,30 +28,36 @@ static struct sigaction ignore_action = {.sa_handler = SIG_IGN},
  *   - SIGINT
  *   - SIGTTOU
  *
- * Should be called immediately on entry to main() 
+ * Should be called immediately on entry to main()
  *
  * Saves old signal dispositions for a later call to signal_restore()
  */
-int
-signal_init(void)
+int signal_init(void)
 {
-  /* TODO Initialize signals, store old actions 
+  /* TODO Initialize signals, store old actions
    *
    * e.g. sigaction(SIGNUM, &new_handler, &saved_old_handler);
    *
    * */
-  errno = ENOSYS; /* not implemented */
-  return -1;
+  struct sigaction signal_action;
+
+  if (sigaction(SIGTSTP, &signal_action, &old_sigtstp) == -1)
+    return -1;
+  if (sigaction(SIGINT, &signal_action, &old_sigint) == -1)
+    return -1;
+  if (sigaction(SIGTTOU, &signal_action, &old_sigttou) == -1)
+    return -1;
+
+  return 0;
 }
 
-/** enable signal to interrupt blocking syscalls (read/getline, etc) 
+/** enable signal to interrupt blocking syscalls (read/getline, etc)
  *
  * @returns 0 on succes, -1 on failure
  *
  * does not save old signal disposition
  */
-int
-signal_enable_interrupt(int sig)
+int signal_enable_interrupt(int sig)
 {
   /* TODO set the signal disposition for signal to interrupt  */
   errno = ENOSYS; /* not implemented */
@@ -63,8 +70,7 @@ signal_enable_interrupt(int sig)
  *
  * does not save old signal disposition
  */
-int
-signal_ignore(int sig)
+int signal_ignore(int sig)
 {
   /* TODO set the signal disposition for signal back to its old state */
   errno = ENOSYS; /* not implemented */
@@ -76,14 +82,14 @@ signal_ignore(int sig)
  * @returns 0 on success, -1 on failure
  *
  */
-int
-signal_restore(void)
+int signal_restore(void)
 {
-  /* TODO restore old actions 
-   *
-   * e.g. sigaction(SIGNUM, &saved_old_handler, NULL);
-   *
-   * */
-  errno = ENOSYS; /* not implemented */
-  return -1;
+  if (sigaction(SIGTSTP, &old_sigtstp, 0) == -1)
+    return -1;
+  if (sigaction(SIGINT, &old_sigint, 0) == -1)
+    return -1;
+  if (sigaction(SIGTTOU, &old_sigttou, 0) == -1)
+    return -1;
+
+  return 0;
 }
