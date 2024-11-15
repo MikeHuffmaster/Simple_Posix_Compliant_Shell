@@ -92,6 +92,7 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
        */
       target_dir = getenv("HOME");
     }
+    
   }
   else if (cmd->word_count == 2) // there is ecactly one argument for cd
   {
@@ -105,6 +106,7 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
     return -1; // failed check
   }
   chdir (target_dir);
+  setenv("PWD", target_dir, 1);
   return 0;
 }
 
