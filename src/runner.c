@@ -344,8 +344,11 @@ do_io_redirects(struct command *cmd)
                 /* [n]>&- and [n]<&- close file descriptor [n] */
                 /* TODO close file descriptor n.
                  *
-                 * XXX What is n? Look for it in `struct io_redir->???` (parser.h)
+                 * XXX What is n? Look for it in `struct io_redir->???` (parser.h)  io number
                  */
+                if(close(r->io_number) == -1){
+                    goto err; 
+                }
             }
             else
             {
@@ -370,6 +373,9 @@ do_io_redirects(struct command *cmd)
                 )
                 {
                     /* TODO duplicate src to dst. */
+                    if(dup2(src, r->io_number) == -1){
+                        goto err;
+                    }
                 }
                 else
                 {
@@ -392,9 +398,17 @@ do_io_redirects(struct command *cmd)
              * XXX Note: you can supply a mode to open() even if you're not creating a
              * file. it will just ignore that argument.
              */
+            int file_descriptor = open(r->filename, flags, 0777);
+            if (file_descriptor == -1){
+                goto err;
+            }
 
             /* TODO Move the opened file descriptor to the redirection target */
             /* XXX use move_fd() */
+
+            if (move_fd(file_descriptor, r->io_number) == -1){
+                goto err;
+            }
         }
         if (0)
         {
