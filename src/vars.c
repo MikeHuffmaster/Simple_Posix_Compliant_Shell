@@ -52,7 +52,7 @@ is_valid_varname(char const *name)
 
   for (int i = 1; i < length; i++)
   {
-    if (!isalnum(name[i] && name[i] != '_'))
+    if (!isalnum(name[i]) && name[i] != '_')
     {
       return 0;
     }
@@ -71,8 +71,14 @@ int vars_is_valid_varname(char const *name)
 {
   /* TODO: Implement argument validation before tail-calling internal
    * is_valid_varname() function. */
+
+if (!is_valid_varname(name))
+{
   errno = ENOSYS;
   return -1;
+}
+
+return 0;
 }
 
 /** returns nullptr if not found
