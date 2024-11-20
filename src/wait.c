@@ -69,7 +69,7 @@ int wait_on_fg_pgid(pid_t const pgid)
         else if (WIFSIGNALED(status))
         {
           /* TODO set params.status to the correct value */
-          params.status = WTERMSIG(status);
+          params.status = WTERMSIG(status) + 128 ;
         }
 
         /* TODO remove the job for this group from the job list
@@ -93,6 +93,7 @@ int wait_on_fg_pgid(pid_t const pgid)
     if (WIFSTOPPED(status))
     {
       fprintf(stderr, "[%jd] Stopped\n", (intmax_t)jid);
+      jobs_set_status(jid, status);
       goto out;
     }
 
