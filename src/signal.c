@@ -60,8 +60,10 @@ int signal_init(void)
 int signal_enable_interrupt(int sig)
 {
   /* TODO set the signal disposition for signal to interrupt  */
-  errno = ENOSYS; /* not implemented */
-  return -1;
+  if (sigaction(sig, &interrupt_action, 0) == -1){
+    return -1;
+  }
+  return 0;
 }
 
 /** ignore a signal
@@ -73,8 +75,10 @@ int signal_enable_interrupt(int sig)
 int signal_ignore(int sig)
 {
   /* TODO set the signal disposition for signal back to its old state */
-  errno = ENOSYS; /* not implemented */
-  return -1;
+  if (sigaction(sig, &ignore_action, 0) == =1){
+    return -1;
+  }
+  return 0;
 }
 
 /** Restores signal dispositions to what they were when bigshell was invoked

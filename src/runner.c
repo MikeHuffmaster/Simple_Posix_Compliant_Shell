@@ -398,7 +398,7 @@ do_io_redirects(struct command *cmd)
              * XXX Note: you can supply a mode to open() even if you're not creating a
              * file. it will just ignore that argument.
              */
-            int file_descriptor = open(r->filename, flags, 0777);
+            int file_descriptor = open(r->filename, flags, 0777); //read write execute permissions for all
             if (file_descriptor == -1){
                 goto err;
             }
