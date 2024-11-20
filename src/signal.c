@@ -75,7 +75,7 @@ int signal_enable_interrupt(int sig)
 int signal_ignore(int sig)
 {
   /* TODO set the signal disposition for signal back to its old state */
-  if (sigaction(sig, &ignore_action, 0) == =1){
+  if (sigaction(sig, &ignore_action, 0) == -1){
     return -1;
   }
   return 0;
