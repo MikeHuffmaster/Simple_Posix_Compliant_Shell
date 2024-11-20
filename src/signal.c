@@ -39,7 +39,6 @@ int signal_init(void)
    * e.g. sigaction(SIGNUM, &new_handler, &saved_old_handler);
    *
    * */
-  struct sigaction ignore_action;
 
   if (sigaction(SIGTSTP, &ignore_action, &old_sigtstp) == -1)
     return -1;
@@ -60,7 +59,7 @@ int signal_init(void)
 int signal_enable_interrupt(int sig)
 {
   /* TODO set the signal disposition for signal to interrupt  */
-  if (sigaction(sig, &interrupt_action, 0) == -1){
+  if (sigaction(sig, &interrupt_action, NULL) == -1){
     return -1;
   }
   return 0;
@@ -75,7 +74,7 @@ int signal_enable_interrupt(int sig)
 int signal_ignore(int sig)
 {
   /* TODO set the signal disposition for signal back to its old state */
-  if (sigaction(sig, &ignore_action, 0) == -1){
+  if (sigaction(sig, &ignore_action, NULL) == -1){
     return -1;
   }
   return 0;
@@ -88,12 +87,11 @@ int signal_ignore(int sig)
  */
 int signal_restore(void)
 {
-  if (sigaction(SIGTSTP, &old_sigtstp, 0) == -1)
+  if (sigaction(SIGTSTP, &old_sigtstp, NULL) == -1)
     return -1;
-  if (sigaction(SIGINT, &old_sigint, 0) == -1)
+  if (sigaction(SIGINT, &old_sigint, NULL) == -1)
     return -1;
-  if (sigaction(SIGTTOU, &old_sigttou, 0) == -1)
+  if (sigaction(SIGTTOU, &old_sigttou, NULL) == -1)
     return -1;
-
   return 0;
 }
