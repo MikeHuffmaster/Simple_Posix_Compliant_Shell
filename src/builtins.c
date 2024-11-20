@@ -193,8 +193,11 @@ builtin_unset(struct command *cmd, struct builtin_redir const *redir_list)
 {
   for (size_t i = 1; i < cmd->word_count; ++i)
   {
-    free(cmd->words[i]); // use free to unset the variables and the set them to NULL
-    cmd->words[i] = NULL;
+    if (cmd->words[i] != NULL){
+      free(cmd->words[i]); // use free to unset the variables and the set them to NULL
+      cmd->words[i] = NULL;
+      // unsetenv(cmd->words[i]);
+    }
   }
   return 0;
 }
