@@ -92,7 +92,6 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
        */
       target_dir = getenv("HOME");
     }
-    
   }
   else if (cmd->word_count == 2) // there is ecactly one argument for cd
   {
@@ -105,7 +104,7 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "There are too many arguments, please try again.\n");
     return -1; // failed check
   }
-  chdir (target_dir);
+  chdir(target_dir);
   setenv("PWD", target_dir, 1);
   return 0;
 }
@@ -193,9 +192,9 @@ builtin_unset(struct command *cmd, struct builtin_redir const *redir_list)
 {
   for (size_t i = 1; i < cmd->word_count; ++i)
   {
-    if (cmd->words[i] != NULL){
+    if (cmd->words[i] != NULL)
+    {
       free(cmd->words[i]); // use free to unset the variables and the set them to NULL
-      unsetenv(cmd->words[i]);
     }
   }
   return 0;
