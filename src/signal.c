@@ -39,7 +39,7 @@ int signal_init(void)
    * e.g. sigaction(SIGNUM, &new_handler, &saved_old_handler);
    *
    * */
-  struct sigaction signal_action;
+  struct sigaction ignore_action;
 
   if (sigaction(SIGTSTP, &ignore_action, &old_sigtstp) == -1)
     return -1;
