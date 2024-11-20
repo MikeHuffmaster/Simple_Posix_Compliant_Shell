@@ -41,11 +41,11 @@ int signal_init(void)
    * */
   struct sigaction signal_action;
 
-  if (sigaction(SIGTSTP, &signal_action, &old_sigtstp) == -1)
+  if (sigaction(SIGTSTP, &ignore_action, &old_sigtstp) == -1)
     return -1;
-  if (sigaction(SIGINT, &signal_action, &old_sigint) == -1)
+  if (sigaction(SIGINT, &ignore_action, &old_sigint) == -1)
     return -1;
-  if (sigaction(SIGTTOU, &signal_action, &old_sigttou) == -1)
+  if (sigaction(SIGTTOU, &ignore_action, &old_sigttou) == -1)
     return -1;
 
   return 0;
