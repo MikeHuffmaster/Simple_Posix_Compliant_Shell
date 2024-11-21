@@ -72,13 +72,13 @@ int vars_is_valid_varname(char const *name)
   /* TODO: Implement argument validation before tail-calling internal
    * is_valid_varname() function. */
 
-if (!is_valid_varname(name))
-{
-  errno = ENOSYS;
-  return -1;
-}
+  if (!is_valid_varname(name))
+  {
+    errno = ENOSYS;
+    return -1;
+  }
 
-return 0;
+  return 0;
 }
 
 /** returns nullptr if not found
@@ -135,8 +135,7 @@ new_var(char const *name)
  *
  * XXX DO NOT MODIFY XXX
  */
-static void
-remove_var(char const *name)
+static void remove_var(char const *name)
 {
   assert(is_valid_varname(name));
   struct var **link = &var_list;
@@ -144,10 +143,10 @@ remove_var(char const *name)
   {
     if (strcmp((*link)->name, name) == 0)
     {
-      void *tmp = (*link)->next;
-      free((*link)->value);
-      free(*link);
-      *link = tmp;
+      struct var *tmp = *link;
+      *link = (*link)->next; // Unlink the current variable
+      free(tmp->value);      // Free its value
+      free(tmp);             // Free the variable itself
       break;
     }
   }
