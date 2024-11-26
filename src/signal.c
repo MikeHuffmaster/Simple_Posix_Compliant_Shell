@@ -59,7 +59,8 @@ int signal_init(void)
 int signal_enable_interrupt(int sig)
 {
   /* TODO set the signal disposition for signal to interrupt  */
-  if (sigaction(sig, &interrupt_action, NULL) == -1){
+  if (sigaction(sig, &interrupt_action, NULL) == -1)
+  {
     return -1;
   }
   return 0;
@@ -74,7 +75,8 @@ int signal_enable_interrupt(int sig)
 int signal_ignore(int sig)
 {
   /* TODO set the signal disposition for signal back to its old state */
-  if (sigaction(sig, &ignore_action, NULL) == -1){
+  if (sigaction(sig, &ignore_action, NULL) == -1)
+  {
     return -1;
   }
   return 0;

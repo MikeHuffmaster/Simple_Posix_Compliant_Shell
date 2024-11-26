@@ -74,6 +74,7 @@ static int
 builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
 {
   char const *target_dir = 0;
+  char current_directory[PATH_MAX];
   if (cmd->word_count == 1)
   {
     target_dir = vars_get("HOME");
@@ -104,8 +105,19 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "There are too many arguments, please try again.\n");
     return -1; // failed check
   }
-  chdir(target_dir);
-  setenv("PWD", target_dir, 1);
+
+  if (chdir(target_dir) < 0)
+  {
+    dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "No such file or directory\n");
+    return -1;
+  }
+
+  if (getcwd(current_directory, sizeof(current_directory)) == NULL)
+  {
+    dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Could not find specified directory\n");
+    return -1;
+  }
+  setenv("PWD", current_directory, 1);
   return 0;
 }
 
