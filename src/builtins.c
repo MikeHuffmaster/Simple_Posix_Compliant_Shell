@@ -216,7 +216,7 @@ builtin_unset(struct command *cmd, struct builtin_redir const *redir_list)
         dprintf(get_pseudo_fd(redir_list, STDIN_FILENO), "Cannot unset variable\n");
       }
 
-      // unsetenv(cmd->words[i]);
+      unsetenv(cmd->words[i]);
     }
   }
   return 0;
