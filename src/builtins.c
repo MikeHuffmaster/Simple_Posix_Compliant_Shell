@@ -117,7 +117,12 @@ builtin_cd(struct command *cmd, struct builtin_redir const *redir_list)
     dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Could not find specified directory\n");
     return -1;
   }
-  setenv("PWD", current_directory, 1);
+
+  if (vars_set("PWD", current_directory) < 0)
+  {
+    dprintf(get_pseudo_fd(redir_list, STDERR_FILENO), "Could not update the current working directory\n");
+    return -1;
+  }
   return 0;
 }
 
