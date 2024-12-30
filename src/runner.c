@@ -658,7 +658,7 @@ int run_command_list(struct command_list *cl)
                 if (do_variable_assignment(cmd, 1) < 0)
                     err(1, 0);
 
-                /* Restore signals to their original values when bigshell was invoked
+                /* Restore signals to their original values when custom shell was invoked
                  */
                 if (signal_restore() < 0)
                     err(1, 0);

@@ -143,7 +143,7 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
   if (cmd->word_count == 1)
   {
     printf("Exit status %d\n", params.status);
-    bigshell_exit();
+    customshell_exit();
   }
 
   else
@@ -158,7 +158,7 @@ builtin_exit(struct command *cmd, struct builtin_redir const *redir_list)
     }
     params.status = (int)n;
     printf("Exit status %d\n", params.status);
-    bigshell_exit();
+    customshell_exit();
   }
   // tokenize the command and if the first word is exit, the second command should be the exit status
   // set params.status to that exit status strtol from videos?

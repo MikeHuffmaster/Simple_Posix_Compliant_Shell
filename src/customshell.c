@@ -17,7 +17,7 @@
 #include "util/gprintf.h"
 #include "wait.h"
 
-/** Main bigshell loop
+/** Main Custom Shell loop
  */
 int
 main(int argc, char *argv[])
@@ -60,7 +60,7 @@ prompt:
       errno = 0;
       goto prompt;
     } else if (res == 0) { /* No commands parsed */
-      if (feof(stdin)) bigshell_exit(); /* Exit on eof */
+      if (feof(stdin)) customshell_exit(); /* Exit on eof */
       goto prompt; /* Blank line */
     } else {
       gprintf("Parsed command list to execute:");
@@ -85,5 +85,5 @@ err:
   free(cl);
   params.status = 127;
   warn(0);
-  bigshell_exit();
+  customshell_exit();
 }

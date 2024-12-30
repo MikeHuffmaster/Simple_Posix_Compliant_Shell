@@ -32,7 +32,7 @@ int wait_on_fg_pgid(pid_t const pgid)
     tcsetpgrp(STDIN_FILENO, pgid);
   }
 
-  /* XXX From this point on, all exit paths must account for setting bigshell
+  /* XXX From this point on, all exit paths must account for setting custom shell
    * back to the foreground process group--no naked return statements */
   int retval = 0;
 
@@ -117,7 +117,7 @@ out:
     sa.sa_flags = 0;
     sigaction(SIGTTOU, &sa, &old_sa);
 
-    // Set bigshell as the foreground process group
+    // Set custom shell as the foreground process group
     tcsetpgrp(STDIN_FILENO, getpgid(0));
 
     // Restore previous SIGTTOU behavior
