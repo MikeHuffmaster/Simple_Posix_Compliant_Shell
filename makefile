@@ -9,7 +9,7 @@ all: $(TARGETS)
 compile_commands.json:
 	bear -- $(MAKE) -B all
 
-EXE := bigshell
+EXE := CustomShell
 SRCS := $(shell find src -type f -name '*.c')
 OBJS := $(SRCS:src/%.c=%.o)
 
